@@ -8,33 +8,40 @@ let isHidden = false
 
 arrow.addEventListener('click', () => window.electronAPI.setSide())
 
-pause.addEventListener('click', () => {
+speech.addEventListener('click', () => {
     window.electronAPI.collapse()
     if (!isHidden) {
-        pause.style.marginTop = "calc(50vh - 35px)"
+        speech.style.marginTop = "calc(50vh - 35px)"
         arrow.style.display = "none"
         deleteBtn.style.display = "none"
-        speech.style.display = "none"
+        pause.style.display = "none"
         isHidden = !isHidden
-        setTimeout(function() {
-            hoverListener.style.backgroundColor = "rgba(25, 17, 26, 0.1)"
-        }, 5000)
-        setTimeout(function() {
-            pause.style.backgroundColor = "rgba(255, 255, 255, 0.1)"
-        }, 5000)
     }
     else {
         arrow.style.display = "initial"
         deleteBtn.style.display = "initial"
-        speech.style.display = "initial"
+        pause.style.display = "initial"
         isHidden = !isHidden
-        pause.style.marginTop = "calc(0.1 * 100vh)"
+        speech.style.marginTop = "calc(0.1 * 100vh)"
     }
 })
 
-hoverListener.addEventListener("mouseenter", () => {
+hoverListener.addEventListener("mouseover", () => {
     hoverListener.style.backgroundColor = "rgba(25, 17, 26, 1)"
-    pause.style.backgroundColor = "rgba(255, 255, 255, 1)"
+    pause.style.opacity = "1"
+    speech.style.opacity = "1"
+    deleteBtn.style.opacity = "1"
+    arrow.style.opacity = "1"
+})
+
+hoverListener.addEventListener("mouseleave", () => {
+    setTimeout(function() {
+        hoverListener.style.backgroundColor = "rgba(25, 17, 26, 0.5)"
+        pause.style.opacity = "0.5"
+        speech.style.opacity = "0.5"
+        deleteBtn.style.opacity = "0.5"
+        arrow.style.opacity = "0.5"
+    }, 5000)
 })
 
 deleteBtn.addEventListener("click", () => {

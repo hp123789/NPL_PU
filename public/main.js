@@ -3,6 +3,7 @@ const remote = require('electron')
 const {screen} = remote
 const redis = require('redis')
 var ks = require('node-key-sender')
+require('dotenv').config();
 
 const client = redis.createClient()
 const stream_name = "stream2"
