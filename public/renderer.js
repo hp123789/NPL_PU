@@ -1,49 +1,119 @@
-const arrow = document.getElementById('triangle')
+const arrow = document.getElementById('switch')
 const pause = document.getElementById('pause')
 const hoverListener = document.getElementById('hoverListener')
 const deleteBtn = document.getElementById('delete')
 const speech = document.getElementById('speech')
+const text = document.getElementById('text')
+const done = document.getElementById('done')
+const textdiv = document.getElementById('text-div')
+const speechdiv = document.getElementById('speech-div')
+const menu = document.getElementById('menu')
+const container = document.getElementById('container')
+const bar1 = document.getElementById('bar1')
+const bar2 = document.getElementById('bar2')
+const bar3 = document.getElementById('bar3')
 
 let isHidden = false
+let speechMode = false
+let leftSide = true
+bar1.style.width = "25px"
+bar2.style.width = "30px"
 
-arrow.addEventListener('click', () => window.electronAPI.setSide())
+arrow.addEventListener('click', () => {
+    window.electronAPI.setSide()
+    if (leftSide) {
+        container.style.flexDirection = "row-reverse"
+        bar1.style.marginRight = "0"
+        bar1.style.marginLeft = "auto"
+        bar2.style.marginRight = "0"
+        bar2.style.marginLeft = "auto"
+        leftSide = !leftSide
+    } else {
+        container.style.flexDirection = "row"
+        bar1.style.marginRight = "auto"
+        bar1.style.marginLeft = "0"
+        bar2.style.marginRight = "auto"
+        bar2.style.marginLeft = "0"
+        leftSide = !leftSide
+    }
+})
 
-speech.addEventListener('click', () => {
+menu.addEventListener('click', () => {
     window.electronAPI.collapse()
     if (!isHidden) {
-        speech.style.marginTop = "calc(50vh - 35px)"
+        if (leftSide) {
+            menu.style.marginLeft = "30px"
+        } else {
+            menu.style.marginRight = "30px"
+        }
+        bar1.style.width = "35px"
+        bar2.style.width = "35px"
         arrow.style.display = "none"
         deleteBtn.style.display = "none"
         pause.style.display = "none"
+        speech.style.display = "none"
+        done.style.display = "none"
+        text.style.display = "none"
         isHidden = !isHidden
     }
     else {
+        bar1.style.width = "25px"
+        bar2.style.width = "30px"
         arrow.style.display = "initial"
         deleteBtn.style.display = "initial"
         pause.style.display = "initial"
+        speech.style.display = "initial"
         isHidden = !isHidden
-        speech.style.marginTop = "calc(0.1 * 100vh)"
+        menu.style.marginLeft = "initial"
+        done.style.display = "initial"
+        text.style.display = "initial"
     }
 })
 
-hoverListener.addEventListener("mouseover", () => {
-    hoverListener.style.backgroundColor = "rgba(25, 17, 26, 1)"
-    pause.style.opacity = "1"
-    speech.style.opacity = "1"
-    deleteBtn.style.opacity = "1"
-    arrow.style.opacity = "1"
-})
+// hoverListener.addEventListener("mouseover", () => {
+//     hoverListener.style.backgroundColor = "rgba(25, 17, 26, 1)"
+//     pause.style.opacity = "1"
+//     text.style.opacity = "1"
+//     deleteBtn.style.opacity = "1"
+//     arrow.style.opacity = "1"
+//     speech.style.opacity = "1"
+//     done.style.opacity = "1"
+//     menu.style.opacity = "1"
+// })
 
-hoverListener.addEventListener("mouseleave", () => {
-    setTimeout(function() {
-        hoverListener.style.backgroundColor = "rgba(25, 17, 26, 0.5)"
-        pause.style.opacity = "0.5"
-        speech.style.opacity = "0.5"
-        deleteBtn.style.opacity = "0.5"
-        arrow.style.opacity = "0.5"
-    }, 5000)
-})
+// hoverListener.addEventListener("mouseleave", () => {
+//     setTimeout(function() {
+//         hoverListener.style.backgroundColor = "rgba(25, 17, 26, 0.5)"
+//         pause.style.opacity = "0.5"
+//         text.style.opacity = "0.5"
+//         deleteBtn.style.opacity = "0.5"
+//         arrow.style.opacity = "0.5"
+//         speech.style.opacity = "0.5"
+//         done.style.opacity = "0.5"
+//         menu.style.opacity = "0.5"
+//     }, 5000)
+// })
 
 deleteBtn.addEventListener("click", () => {
     window.electronAPI.backspace()
 })
+
+speech.addEventListener("click", () => {
+    speechMode = true
+    speech.style.filter = "invert(71%) sepia(12%) saturate(1805%) hue-rotate(187deg) brightness(99%) contrast(108%)"
+    text.style.filter = "invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%)"
+})
+
+text.addEventListener("click", () => {
+    speechMode = false
+    speech.style.filter = "invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%)"
+    text.style.filter = "invert(71%) sepia(12%) saturate(1805%) hue-rotate(187deg) brightness(99%) contrast(108%)"
+})
+
+// if (speechMode) {
+//     speech.style.backgroundColor = "grey"
+//     text.style.backgroundColor = "none"
+// } else {
+//     text.style.backgroundColor = "grey"
+//     speech.style.backgroundColor = "none"
+// }

@@ -3,7 +3,8 @@ const remote = require('electron')
 const {screen} = remote
 const redis = require('redis')
 var ks = require('node-key-sender')
-require('dotenv').config();
+require('dotenv').config()
+
 
 const client = redis.createClient()
 const stream_name = "stream2"
@@ -11,52 +12,10 @@ const stream_name = "stream2"
 let leftSide = true
 let isCollapsed = true
 
-async function startRedisClient() {
-  client.on('error', err => console.log('Redis Client Error', err))
-  await client.connect()
-}
-
-async function redisGet() {
-  const value = await client.get('output_stream');
-  console.log(value)
-  return value
-}
-
-async function redisXread() {
-  while (true) {
-    let response = await client.xRead(
-      redis.commandOptions({
-        isolated: true
-      }), [
-        {
-          key: stream_name,
-          id: '0-0'
-        }
-      ], {
-        COUNT: 1,
-        BLOCK: 5000
-      }
-    )
-    let currentId = response[0].messages[0]
-    console.log(JSON.stringify(currentId))
-  }
-}
-
-async function redisXrevrange() {
-    let response = await client.xRevRange(stream_name, '+', '-', 'COUNT', '1', function(err, Data) {})
-    response = response[0].message['word']
-    response = JSON.stringify(response).replace(/^"(.*)"$/, '$1')
-    return response
-  }
-
-async function redisXadd() {
-  client.xAdd(stream_name, "*", "state", "speech", "word", "word1")
-}
-
 function createWindow () {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const windowHeight = parseInt(0.8*height)
-  const windowWidth = parseInt(0.1*width)
+  const windowHeight = parseInt(0.1*height)
+  const windowWidth = parseInt(0.5*width)
   const win = new BrowserWindow({
     width: windowWidth,
     height: windowHeight,
@@ -67,8 +26,8 @@ function createWindow () {
     transparent: true,
     alwaysOnTop: true,
     titleBarStyle: 'hidden',
-    x: parseInt(0.1*windowWidth),
-    y: parseInt((height-windowHeight)/2),
+    x: parseInt(0.05*windowWidth),
+    y: parseInt((height-windowHeight)-(windowHeight*0.2)),
     webPreferences: {
       nodeIntegration: true,
       preload: __dirname + "\\preload.js"
@@ -77,24 +36,30 @@ function createWindow () {
 
   ipcMain.on('set-side', () => {
     if (leftSide) {
-      win.setPosition((width - parseInt(0.1*windowWidth) - windowWidth), parseInt((height-windowHeight)/2), true)
+      win.setPosition((width - parseInt(0.05*windowWidth) - windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
       leftSide = !leftSide
     }
     else {
-      win.setPosition(parseInt(0.1*windowWidth), parseInt((height-windowHeight)/2), true)
+      win.setPosition(parseInt(0.05*windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
       leftSide = !leftSide
     }
   })
 
   ipcMain.on('collapse-menu', () => {
     if (isCollapsed) {
-      win.setMinimumSize(windowWidth,windowWidth,true)
-      win.setSize(windowWidth,windowWidth,true)
+      win.setMinimumSize(windowHeight,windowHeight,true)
+      win.setSize(windowHeight,windowHeight,true)
+      if (!leftSide) {
+        win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+      }
       isCollapsed = !isCollapsed
     }
     else {
       win.setMinimumSize(windowWidth,windowHeight,true)
       win.setSize(windowWidth,windowHeight,true)
+      if (!leftSide) {
+        win.setPosition((width - parseInt(0.05*windowWidth) - windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+      }
       isCollapsed = !isCollapsed
     }
   })
@@ -113,10 +78,15 @@ function createWindow () {
   // win.webContents.openDevTools()
 }
 
+async function keylogger() {
+  
+}
+
 app.whenReady().then(() => {
   // startRedisClient()
   // redisXrevrange()
   createWindow()
+  keylogger()
 })
 
 app.on('window-all-closed', () => {
@@ -131,3 +101,45 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+async function startRedisClient() {
+  client.on('error', err => console.log('Redis Client Error', err))
+  await client.connect()
+}
+
+async function redisGet() {
+  const value = await client.get('output_stream');
+  console.log(value)
+  return value
+}
+
+// async function redisXread() {
+//   while (true) {
+//     let response = await client.xRead(
+//       redis.commandOptions({
+//         isolated: true
+//       }), [
+//         {
+//           key: stream_name,
+//           id: '0-0'
+//         }
+//       ], {
+//         COUNT: 1,
+//         BLOCK: 5000
+//       }
+//     )
+//     let currentId = response[0].messages[0]
+//     console.log(JSON.stringify(currentId))
+//   }
+// }
+
+// async function redisXrevrange() {
+//     let response = await client.xRevRange(stream_name, '+', '-', 'COUNT', '1', function(err, Data) {})
+//     response = response[0].message['word']
+//     response = JSON.stringify(response).replace(/^"(.*)"$/, '$1')
+//     return response
+//   }
+
+// async function redisXadd() {
+//   client.xAdd(stream_name, "*", "state", "speech", "word", "word1")
+// }

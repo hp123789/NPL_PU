@@ -1,61 +1,120 @@
 .container {
-    position: absolute;
+    /* position: absolute; */
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
+    gap: 5vh;
     height: 100vh;
     width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
-.triangle {
-    margin-bottom: calc(0.1 * 100vh);
-    width: 0; 
-    height: 0; 
-    border-top: 30px solid transparent;
-    border-bottom: 30px solid transparent;
-  
-    border-left: 40px solid #AEBFE4;
+.text-img {
+    max-height: 60vh;
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+}
+
+.text-img:hover {
+    scale: 1.1;
 }
 
 .switch-img {
-    margin-bottom: calc(0.1 * 100vh);
-    width: 100px;
+    max-height: 60vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+}
+
+.switch-img:hover {
+    scale: 1.1;
 }
 
 .pause-img {
-    width: 70px;
+    max-height: 50vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+}
+
+.pause-img:hover {
+    scale: 1.1;
 }
 
 .delete-img {
-    width: 70px;
+    width: 45vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
 }
 
-.delete-img:active {
+.delete-img:hover {
     scale: 1.1;
 }
 
 .speech-img {
-    margin-top: calc(0.1 * 100vh);
-    width: 80px;
+    width: 50vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
 }
 
-.pause:active {
+.speech-img:hover {
     scale: 1.1;
 }
 
-/* .delete {
-    position: relative;
-    margin-top: 150px;
-    scale: 0.4;
-    filter: invert(81%) sepia(7%) saturate(1401%) hue-rotate(186deg) brightness(98%) contrast(83%);
+.menu-img {
+    /* width: 80px;
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%); */
+    display: inline-block;
+    width: 35px;
+    height: 35px;
 }
 
-.speech {
-    scale: 0.6;
-    filter: invert(81%) sepia(7%) saturate(1401%) hue-rotate(186deg) brightness(98%) contrast(83%);
-} */
+.menu-img:hover {
+    scale: 1.1;
+}
+
+.bar1, .bar2, .bar3 {
+    position: relative;
+    width: 35px;
+    height: 5px;
+    background-color: white;
+    margin: 6px 0;
+    transition: 0.4s;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url(./images/Inter-VariableFont_slnt\,wght.ttf);
+    font-weight: 700;
+    font-style: normal;
+}
+
+.done {
+    font-family: 'Inter';
+    user-select: none;
+    color: white;
+    font-size: 30px;
+}
+
+.done:hover {
+    scale: 1.1;
+}
+
+.text-div {
+    order: 0;
+}
+
+.speech-div {
+    order: 1;
+}
+
+.pause-div {
+    order: 2;
+}
+
+.delete-div {
+    order: 3;
+}
+
+.done-div {
+    order: 4;
+}
+
+.switch-div {
+    order: 5;
+}
