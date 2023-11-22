@@ -231,16 +231,21 @@ app.on('activate', () => {
 })
 
 async function readSerial() {
-  const port = new SerialPort({ path: 'COM3', baudRate: 115200 })
 
+  const port = new SerialPort({ path: 'COM3', baudRate: 115200 })
+  
   port.on("open", function() {
     console.log("-- Connection opened --");
     port.on("data", function(data) {
       data = String(data.slice(0, -1))
-      data = data.split('')
+      data = data.split(',')
+      console.log(data)
+      data = data[0].split('')
+      data.push("space")
       ks.sendKeys(data)
-      ks.sendKey("space")
-      console.log(data);
+        // ks.sendKey("space")
+      console.log(data)
+      // port.write('done\n')
     });
   })
 }
