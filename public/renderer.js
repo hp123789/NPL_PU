@@ -14,6 +14,7 @@ const bar2 = document.getElementById('bar2')
 const bar3 = document.getElementById('bar3')
 const line1 = document.getElementById('line1')
 const line2 = document.getElementById('line2')
+// const playsound = document.getElementById('playsound')
 
 let isHidden = false
 let speechMode = false
@@ -106,9 +107,7 @@ menu.addEventListener('click', () => {
 // })
 
 deleteBtn.addEventListener("click", () => {
-    if (!speechMode) {
-        window.electronAPI.backspace()
-    }
+    window.electronAPI.backspace()
 })
 
 speech.addEventListener("click", () => {
@@ -159,10 +158,14 @@ pause.addEventListener("click", () => {
     }
 })
 
-// if (speechMode) {
-//     speech.style.backgroundColor = "grey"
-//     text.style.backgroundColor = "none"
-// } else {
-//     text.style.backgroundColor = "grey"
-//     speech.style.backgroundColor = "none"
-// }
+done.addEventListener("click", () => {
+    window.electronAPI.done()
+})
+
+// playsound.addEventListener("mouseover", () => {
+//     playsound.style.scale = "1.3"
+// })
+
+// playsound.addEventListener("click", () => {
+//     window.electronAPI.play()
+// })

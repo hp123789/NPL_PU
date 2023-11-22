@@ -6,5 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   backspace: () => ipcRenderer.send('back-space'),
   pause: () => ipcRenderer.send('pause-button'),
   speech: () => ipcRenderer.send('speech-mode'),
-  text: () => ipcRenderer.send('text-mode')
+  text: () => ipcRenderer.send('text-mode'),
+  done: () => ipcRenderer.send('done-button'),
+  play: () => ipcRenderer.send('play-button')
 })

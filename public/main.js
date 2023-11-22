@@ -13,6 +13,8 @@ const stream_name = "stream2"
 let leftSide = true
 let isCollapsed = true
 let paused = false
+let done = false
+let speech = false
 
 function createWindow () {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -69,12 +71,18 @@ function createWindow () {
   })
 
   ipcMain.on('back-space', () => {
-    setTimeout(function() {
-      ks.sendCombination(["alt","tab"])
+    if (speech) {
       setTimeout(function() {
         ks.sendCombination(['control','back_space'])
       }, 100)
-    }, 10)
+    } else {
+      setTimeout(function() {
+        ks.sendCombination(["alt","tab"])
+        setTimeout(function() {
+          ks.sendCombination(['control','back_space'])
+        }, 100)
+      }, 10)
+    }
   })
 
   ipcMain.on('pause-button', () => {
@@ -89,9 +97,19 @@ function createWindow () {
 
   ipcMain.on('speech-mode', () => {
     createNewWindow()
-    // setTimeout(function() {
-    //   ks.sendCombination(["alt","tab"])
-    // }, 100)
+    speech = true
+  })
+
+  ipcMain.on('done-button', () => {
+    done = true
+    win.hide()
+    playWindow()
+  })
+
+  ipcMain.on('play-button', () => {
+    win.show()
+    done = false
+    ks.sendCombination(["alt","tab"])
   })
 
   win.loadURL('http://localhost:3000');
@@ -117,7 +135,7 @@ function createNewWindow() {
     y: parseInt((height-windowHeight)-(windowHeight*1.2)),
     webPreferences: {
       nodeIntegration: true,
-      // preload: __dirname + "\\preload.js"
+      preload: __dirname + "\\preload.js"
     }
   })
 
@@ -130,20 +148,62 @@ function createNewWindow() {
     win2 = null;
   });
 
+  win2.on('blur', () => {
+    if (!done) {
+      ks.sendCombination(["alt","tab"])
+    }
+  })
+
   ipcMain.on('text-mode', () => {
     win2.hide()
+    speech = false
   })
 
   win2.loadFile(__dirname + "\\caption.html");
 }
 
-// use for speech mode to tab back into electron app
-// app.on('browser-window-blur', () => {
-//   console.log('window unfocused')
-//   setTimeout(function() {
-//     ks.sendCombination(["alt","tab"])
-//   }, 10)
-// })
+function playWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const windowHeight = parseInt(0.1*height)
+  const windowWidth = parseInt(0.3*width)
+  let win3 = new BrowserWindow({
+    width: windowWidth,
+    height: windowHeight,
+    maxWidth: windowWidth, minWidth: windowWidth,
+    maxHeight: windowHeight, minHeight: windowHeight,
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    alwaysOnTop: true,
+    titleBarStyle: 'hidden',
+    x: parseInt((0.5*width)-(0.5*windowWidth)),
+    y: parseInt((height-windowHeight)-(windowHeight*0.2)),
+    webPreferences: {
+      nodeIntegration: true,
+      preload: __dirname + "\\preload.js"
+    }
+  })
+
+  win3.on('close', () => {
+    win3 = null;
+  });
+
+    // set to null
+  win3.on('closed', () => {
+    win3 = null;
+  });
+
+  ipcMain.on('text-mode', () => {
+    win3.hide()
+  })
+
+  ipcMain.on('play-button', () => {
+    win3.hide()
+    done = false
+  })
+
+  win3.loadFile(__dirname + "\\play.html");
+}
 
 app.whenReady().then(() => {
   // startRedisClient()

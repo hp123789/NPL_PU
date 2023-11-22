@@ -1,0 +1,56 @@
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.container {
+    /* position: absolute; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url(./images/Inter-VariableFont_slnt\,wght.ttf);
+    font-weight: 700;
+    font-style: normal;
+}
+
+.playsound {
+    font-family: 'Inter';
+    user-select: none;
+    color: white;
+    font-size: 40px;
+    transition: all .2s ease-in-out;
+    order: 0;
+}
+
+.playsound:hover {
+    scale: 1.3;
+}
+
+.redo {
+    font-family: 'Inter';
+    user-select: none;
+    color: white;
+    font-size: 40px;
+    transition: all .2s ease-in-out;
+    order: 3;
+}
+
+.redo:hover {
+    scale: 1.3;
+}
+
+.line {
+    border-left: 3px solid white;
+    height: 80vh;
+    order: 2;
+    left: 50%;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="stylesheet" href="play.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title style="opacity: 0;">UCD NPL PU</title>
+  </head>
+  <body id="hoverListener" style="background-color: #19111A;">
+    <div class="container" id="container">
+      <div class="playsound" id="playsound">PLAY</div>
+      <div class="line" id="line"></div>
+      <div class="redo" id="redo">REDO</div>
+    </div>
+    <script>
+        document.getElementById("playsound").addEventListener("click", () => {
+            window.electronAPI.play()
+        })
+    </script>
+  </body>
+</html>
