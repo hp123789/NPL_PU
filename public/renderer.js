@@ -12,12 +12,17 @@ const container = document.getElementById('container')
 const bar1 = document.getElementById('bar1')
 const bar2 = document.getElementById('bar2')
 const bar3 = document.getElementById('bar3')
+const line1 = document.getElementById('line1')
+const line2 = document.getElementById('line2')
 
 let isHidden = false
 let speechMode = false
 let leftSide = true
+let paused = false
 bar1.style.width = "25px"
 bar2.style.width = "30px"
+text.style.filter = "invert(71%) sepia(12%) saturate(1805%) hue-rotate(187deg) brightness(99%) contrast(108%)"
+done.style.filter = "invert(52%) sepia(23%) saturate(8%) hue-rotate(41deg) brightness(89%) contrast(83%)"
 
 arrow.addEventListener('click', () => {
     window.electronAPI.setSide()
@@ -42,8 +47,10 @@ menu.addEventListener('click', () => {
     window.electronAPI.collapse()
     if (!isHidden) {
         if (leftSide) {
+            // fix this
             menu.style.marginLeft = "30px"
         } else {
+            // fix this
             menu.style.marginRight = "30px"
         }
         bar1.style.width = "35px"
@@ -54,6 +61,8 @@ menu.addEventListener('click', () => {
         speech.style.display = "none"
         done.style.display = "none"
         text.style.display = "none"
+        line1.style.display = "none"
+        line2.style.display = "none"
         isHidden = !isHidden
     }
     else {
@@ -67,6 +76,8 @@ menu.addEventListener('click', () => {
         menu.style.marginLeft = "initial"
         done.style.display = "initial"
         text.style.display = "initial"
+        line1.style.display = "initial"
+        line2.style.display = "initial"
     }
 })
 
@@ -95,19 +106,57 @@ menu.addEventListener('click', () => {
 // })
 
 deleteBtn.addEventListener("click", () => {
-    window.electronAPI.backspace()
+    if (!speechMode) {
+        window.electronAPI.backspace()
+    }
 })
 
 speech.addEventListener("click", () => {
     speechMode = true
     speech.style.filter = "invert(71%) sepia(12%) saturate(1805%) hue-rotate(187deg) brightness(99%) contrast(108%)"
     text.style.filter = "invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%)"
+    // deleteBtn.style.filter = "invert(52%) sepia(23%) saturate(8%) hue-rotate(41deg) brightness(89%) contrast(83%)"
+    done.style.filter = "initial"
+    deleteBtn.classList.remove("dehov")
+
+    window.electronAPI.speech()
 })
 
 text.addEventListener("click", () => {
     speechMode = false
     speech.style.filter = "invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%)"
     text.style.filter = "invert(71%) sepia(12%) saturate(1805%) hue-rotate(187deg) brightness(99%) contrast(108%)"
+    done.style.filter = "invert(52%) sepia(23%) saturate(8%) hue-rotate(41deg) brightness(89%) contrast(83%)"
+    // deleteBtn.style.filter = "invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%)"
+    document.getElementById("delete").classList.add("dehov")
+
+    window.electronAPI.text()
+})
+
+pause.addEventListener("click", () => {
+    window.electronAPI.pause()
+    paused = !paused
+    if (paused) {
+        pause.src = './images/play.svg'
+        arrow.style.display = "none"
+        deleteBtn.style.display = "none"
+        menu.style.display = "none"
+        speech.style.display = "none"
+        done.style.display = "none"
+        text.style.display = "none"
+        line1.style.display = "none"
+        line2.style.display = "none"
+    } else {
+        pause.src = './images/pause.svg'
+        arrow.style.display = "initial"
+        deleteBtn.style.display = "initial"
+        speech.style.display = "initial"
+        menu.style.display = "initial"
+        done.style.display = "initial"
+        text.style.display = "initial"
+        line1.style.display = "initial"
+        line2.style.display = "initial"
+    }
 })
 
 // if (speechMode) {

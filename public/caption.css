@@ -1,0 +1,31 @@
+body {
+    /* position: absolute; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url(./images/Inter-VariableFont_slnt\,wght.ttf);
+    font-weight: 700;
+    font-style: normal;
+}
+
+.text-input {
+    text-overflow: ellipsis;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    outline: none;
+    border: none;
+    color: white;
+    font: "Inter";
+    font-size: 70vh;
+    text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
+}

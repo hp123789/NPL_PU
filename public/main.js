@@ -3,6 +3,7 @@ const remote = require('electron')
 const {screen} = remote
 const redis = require('redis')
 var ks = require('node-key-sender')
+const { elementIsDisabled } = require('selenium-webdriver/lib/until')
 require('dotenv').config()
 
 
@@ -11,6 +12,7 @@ const stream_name = "stream2"
 
 let leftSide = true
 let isCollapsed = true
+let paused = false
 
 function createWindow () {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -48,6 +50,7 @@ function createWindow () {
   ipcMain.on('collapse-menu', () => {
     if (isCollapsed) {
       win.setMinimumSize(windowHeight,windowHeight,true)
+      win.setMaximumSize(windowHeight,windowHeight,true)
       win.setSize(windowHeight,windowHeight,true)
       if (!leftSide) {
         win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
@@ -56,6 +59,7 @@ function createWindow () {
     }
     else {
       win.setMinimumSize(windowWidth,windowHeight,true)
+      win.setMaximumSize(windowWidth,windowHeight,true)
       win.setSize(windowWidth,windowHeight,true)
       if (!leftSide) {
         win.setPosition((width - parseInt(0.05*windowWidth) - windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
@@ -73,20 +77,78 @@ function createWindow () {
     }, 10)
   })
 
+  ipcMain.on('pause-button', () => {
+    paused = !paused
+    if (paused) {
+      win.setMaximumSize(width, height)
+    } else {
+      win.setMaximumSize(windowWidth, windowHeight)
+    }
+    win.setFullScreen(paused)
+  })
+
+  ipcMain.on('speech-mode', () => {
+    createNewWindow()
+    // setTimeout(function() {
+    //   ks.sendCombination(["alt","tab"])
+    // }, 100)
+  })
+
   win.loadURL('http://localhost:3000');
 
   // win.webContents.openDevTools()
 }
 
-async function keylogger() {
-  
+function createNewWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const windowHeight = parseInt(0.1*height)
+  const windowWidth = parseInt(0.5*width)
+  let win2 = new BrowserWindow({
+    width: windowWidth,
+    height: windowHeight,
+    maxWidth: windowWidth, minWidth: windowWidth,
+    maxHeight: windowHeight, minHeight: windowHeight,
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    alwaysOnTop: true,
+    titleBarStyle: 'hidden',
+    x: parseInt((0.5*width)-(0.5*windowWidth)),
+    y: parseInt((height-windowHeight)-(windowHeight*1.2)),
+    webPreferences: {
+      nodeIntegration: true,
+      // preload: __dirname + "\\preload.js"
+    }
+  })
+
+  win2.on('close', () => {
+    win2 = null;
+  });
+
+    // set to null
+  win2.on('closed', () => {
+    win2 = null;
+  });
+
+  ipcMain.on('text-mode', () => {
+    win2.hide()
+  })
+
+  win2.loadFile(__dirname + "\\caption.html");
 }
+
+// use for speech mode to tab back into electron app
+// app.on('browser-window-blur', () => {
+//   console.log('window unfocused')
+//   setTimeout(function() {
+//     ks.sendCombination(["alt","tab"])
+//   }, 10)
+// })
 
 app.whenReady().then(() => {
   // startRedisClient()
   // redisXrevrange()
   createWindow()
-  keylogger()
 })
 
 app.on('window-all-closed', () => {
@@ -102,17 +164,17 @@ app.on('activate', () => {
   }
 })
 
-async function startRedisClient() {
-  client.on('error', err => console.log('Redis Client Error', err))
-  await client.connect()
-}
+// async function startRedisClient() {
+//   client.on('error', err => console.log('Redis Client Error', err))
+//   await client.connect()
+// }
 
-async function redisGet() {
-  const value = await client.get('output_stream');
-  console.log(value)
-  return value
-}
-
+// async function redisGet() {
+//   const value = await client.get('output_stream');
+//   console.log(value)
+//   return value
+// }
+// 
 // async function redisXread() {
 //   while (true) {
 //     let response = await client.xRead(

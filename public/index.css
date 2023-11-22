@@ -4,7 +4,6 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    gap: 5vh;
     height: 100vh;
     width: 100vw;
     overflow-x: hidden;
@@ -14,46 +13,56 @@
 .text-img {
     max-height: 60vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .text-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .switch-img {
     max-height: 60vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .switch-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .pause-img {
     max-height: 50vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .pause-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .delete-img {
     width: 45vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .delete-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .speech-img {
     width: 50vh;
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(29deg) brightness(105%) contrast(104%);
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .speech-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .menu-img {
@@ -62,16 +71,19 @@
     display: inline-block;
     width: 35px;
     height: 35px;
+    transition: all .2s ease-in-out;
+    user-select: none;
 }
 
 .menu-img:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .bar1, .bar2, .bar3 {
     position: relative;
     width: 35px;
     height: 5px;
+    border-radius: 2.5px;
     background-color: white;
     margin: 6px 0;
     transition: 0.4s;
@@ -89,32 +101,47 @@
     user-select: none;
     color: white;
     font-size: 30px;
+    transition: all .2s ease-in-out;
 }
 
 .done:hover {
-    scale: 1.1;
+    scale: 1.5;
 }
 
 .text-div {
-    order: 0;
-}
-
-.speech-div {
     order: 1;
 }
 
-.pause-div {
+.speech-div {
     order: 2;
 }
 
-.delete-div {
-    order: 3;
-}
-
-.done-div {
+.pause-div {
     order: 4;
 }
 
-.switch-div {
+.delete-div {
     order: 5;
+}
+
+.done-div {
+    order: 6;
+}
+
+.switch-div {
+    order: 7;
+}
+
+.line1 {
+    border-left: 3px solid white;
+    height: 80vh;
+    left: 50%;
+    order: 0;
+}
+
+.line2 {
+    border-left: 3px solid white;
+    height: 80vh;
+    order: 3;
+    left: 50%;
 }
