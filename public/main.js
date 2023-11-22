@@ -3,8 +3,12 @@ const remote = require('electron')
 const {screen} = remote
 const redis = require('redis')
 var ks = require('node-key-sender')
+const { SerialPort } = require('serialport')
+const { ReadlineParser } = require('@serialport/parser-readline')
 const { elementIsDisabled } = require('selenium-webdriver/lib/until')
 require('dotenv').config()
+const sound = require('sound-play')
+const gTTS = require('gtts')
 
 
 const client = redis.createClient()
@@ -135,7 +139,8 @@ function createNewWindow() {
     y: parseInt((height-windowHeight)-(windowHeight*1.2)),
     webPreferences: {
       nodeIntegration: true,
-      preload: __dirname + "\\preload.js"
+      preload: __dirname + "\\preload.js",
+      contextIsolation: false
     }
   })
 
@@ -208,6 +213,7 @@ function playWindow() {
 app.whenReady().then(() => {
   // startRedisClient()
   // redisXrevrange()
+  readSerial()
   createWindow()
 })
 
@@ -223,6 +229,21 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+async function readSerial() {
+  const port = new SerialPort({ path: 'COM3', baudRate: 115200 })
+
+  port.on("open", function() {
+    console.log("-- Connection opened --");
+    port.on("data", function(data) {
+      data = String(data.slice(0, -1))
+      data = data.split('')
+      ks.sendKeys(data)
+      ks.sendKey("space")
+      console.log(data);
+    });
+  })
+}
 
 // async function startRedisClient() {
 //   client.on('error', err => console.log('Redis Client Error', err))
