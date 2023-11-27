@@ -137,24 +137,8 @@ pause.addEventListener("click", () => {
     paused = !paused
     if (paused) {
         pause.src = './images/play.svg'
-        arrow.style.display = "none"
-        deleteBtn.style.display = "none"
-        menu.style.display = "none"
-        speech.style.display = "none"
-        done.style.display = "none"
-        text.style.display = "none"
-        line1.style.display = "none"
-        line2.style.display = "none"
     } else {
         pause.src = './images/pause.svg'
-        arrow.style.display = "initial"
-        deleteBtn.style.display = "initial"
-        speech.style.display = "initial"
-        menu.style.display = "initial"
-        done.style.display = "initial"
-        text.style.display = "initial"
-        line1.style.display = "initial"
-        line2.style.display = "initial"
     }
 })
 

@@ -12,10 +12,20 @@
   </head>
   <body style="background-color: transparent;">
     <div class="container" id="container">
-        <div>
-            <input class="text-input" id="input" type="text" autofocus="autofocus">
+      <button id="help">help</button>
+        <div class="text-input" id="text-input">
+            <!-- <input class="text-input" id="input" type="text" autofocus="autofocus"> -->
         </div>
     </div>
-    <script src="./renderer.js" defer></script>
+    <script>
+      const text = document.getElementById("text-input")
+      const btn = document.getElementById('help')
+      
+      btn.addEventListener('click', async () => {
+        ipcRenderer.on('asynchronous-message', function (evt, message) {
+          text.innerText = message
+        });
+      })
+  </script>
   </body>
 </html>

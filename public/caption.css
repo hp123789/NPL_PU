@@ -18,7 +18,7 @@ body {
 }
 
 .text-input {
-    text-overflow: ellipsis;
+    /* /* text-overflow: ellipsis; */
     width: 100vw;
     height: 100vh;
     background: transparent;

@@ -91,12 +91,12 @@ function createWindow () {
 
   ipcMain.on('pause-button', () => {
     paused = !paused
-    if (paused) {
-      win.setMaximumSize(width, height)
-    } else {
-      win.setMaximumSize(windowWidth, windowHeight)
-    }
-    win.setFullScreen(paused)
+    // if (paused) {
+    //   win.setMaximumSize(width, height)
+    // } else {
+    //   win.setMaximumSize(windowWidth, windowHeight)
+    // }
+    // win.setFullScreen(paused)
   })
 
   ipcMain.on('speech-mode', () => {
@@ -232,22 +232,34 @@ app.on('activate', () => {
 
 async function readSerial() {
 
-  const port = new SerialPort({ path: 'COM3', baudRate: 115200 })
-  
-  port.on("open", function() {
-    console.log("-- Connection opened --");
-    port.on("data", function(data) {
-      data = String(data.slice(0, -1))
+  const port = new SerialPort({ path: 'COM5', baudRate: 115200 })
+
+  const parser = new ReadlineParser({delimiter: '\n'})
+  port.pipe(parser)
+
+  let p_dat = ""
+  parser.on("data", (line) => {
+    let dat = line
+    if (dat != p_dat) {
+      console.log(dat)
+      p_dat = dat
+      // let data = String(dat.slice(0, -1))
+      let data = dat
       data = data.split(',')
       console.log(data)
-      data = data[0].split('')
-      data.push("space")
-      ks.sendKeys(data)
-        // ks.sendKey("space")
-      console.log(data)
-      // port.write('done\n')
-    });
+      let word = data[0].split('')
+      word.push("space")
+      let sentence = data[1]
+      if (!paused && !speech) {
+        ks.sendKeys(word)
+      }
+      else if (!paused && speech && !done) {
+        // ipcMain.handle('speech-text', pleaseHelp)
+        // remote.webContents.send('async-message', 'help')
+      }
+    }
   })
+
 }
 
 // async function startRedisClient() {
