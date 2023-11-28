@@ -10,7 +10,7 @@ require('dotenv').config()
 const sound = require('sound-play')
 const gTTS = require('gtts')
 const path = require('path')
-const {keyboard, Key} = require("@nut-tree/nut-js")
+const {keyboard, Key, getActiveWindow} = require("@nut-tree/nut-js")
 const Keyboard = require('input-event/lib/keyboard')
 
 
@@ -22,10 +22,19 @@ let isCollapsed = true
 let paused = false
 let done = false
 let speech = false
+let sentence = ""
+let s = ""
 
 async function helpme() {
   console.log('test')
   return "hello"
+}
+
+async function handleFileOpen () {
+  const { canceled, filePaths } = await dialog.showOpenDialog()
+  if (!canceled) {
+    return filePaths[0]
+  }
 }
 
 function createWindow () {
@@ -124,8 +133,6 @@ function createWindow () {
     tabOut()
   })
 
-  win.webContents.send('senddata', "help me pls")
-
   win.loadURL('http://localhost:3000');
 
   // win.webContents.openDevTools()
@@ -174,6 +181,11 @@ function createNewWindow() {
     speech = false
   })
 
+  ipcMain.on('help', () => {
+    console.log('help')
+  })
+  
+
   win2.loadFile(__dirname + "\\caption.html");
 }
 
@@ -216,6 +228,7 @@ function playWindow() {
   })
 
   ipcMain.on('play-button', () => {
+    playSound(sentence)
     win3.hide()
     done = false
   })
@@ -263,13 +276,14 @@ async function readSerial() {
       let word = data[0] + " "
       // let word = data[0].split('')
       // word.push("space")
-      let sentence = data[1]
+      sentence = data[1]
       if (!paused && !speech) {
         typeWord(word)
       }
       else if (!paused && speech && !done) {
         // ipcMain.handle('speech-text', pleaseHelp)
         // remote.webContents.send('async-message', 'help')
+        sendMessage(sentence)
       }
     }
   })
@@ -295,6 +309,25 @@ async function tabOut() {
 
 async function typeWord(w) {
   await keyboard.type(String(w))
+}
+
+async function playSound(input) {
+  var gtts = new gTTS(input, 'en');
+  setTimeout(function() {
+    gtts.save('/tmp/hello.mp3', function (err, result) {
+      if(err) { throw new Error(err) }
+      console.log('Success! Open file /tmp/hello.mp3 to hear result.');
+    });
+  },500)
+  sound.play('/tmp/hello.mp3')
+}
+
+async function sendMessage(message) {
+    if (s != sentence) {
+      console.log('sending')
+      BrowserWindow.getFocusedWindow().webContents.send("message", message)
+      s = sentence
+  }
 }
 
 // async function startRedisClient() {

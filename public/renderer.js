@@ -16,6 +16,7 @@ const line1 = document.getElementById('line1')
 const line2 = document.getElementById('line2')
 // const playsound = document.getElementById('playsound')
 
+
 let isHidden = false
 let speechMode = false
 let leftSide = true

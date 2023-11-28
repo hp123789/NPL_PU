@@ -9,5 +9,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   text: () => ipcRenderer.send('text-mode'),
   done: () => ipcRenderer.send('done-button'),
   play: () => ipcRenderer.send('play-button'),
-  speechText: () => ipcRenderer.invoke('speech-text')
+  help: () => ipcRenderer.send('help')
 })
