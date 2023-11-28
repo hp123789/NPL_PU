@@ -28,18 +28,18 @@ done.style.filter = "invert(52%) sepia(23%) saturate(8%) hue-rotate(41deg) brigh
 arrow.addEventListener('click', () => {
     window.electronAPI.setSide()
     if (leftSide) {
-        container.style.flexDirection = "row-reverse"
-        bar1.style.marginRight = "0"
-        bar1.style.marginLeft = "auto"
-        bar2.style.marginRight = "0"
-        bar2.style.marginLeft = "auto"
+        // container.style.flexDirection = "row-reverse"
+        // bar1.style.marginRight = "0"
+        // bar1.style.marginLeft = "auto"
+        // bar2.style.marginRight = "0"
+        // bar2.style.marginLeft = "auto"
         leftSide = !leftSide
     } else {
-        container.style.flexDirection = "row"
-        bar1.style.marginRight = "auto"
-        bar1.style.marginLeft = "0"
-        bar2.style.marginRight = "auto"
-        bar2.style.marginLeft = "0"
+        // container.style.flexDirection = "row"
+        // bar1.style.marginRight = "auto"
+        // bar1.style.marginLeft = "0"
+        // bar2.style.marginRight = "auto"
+        // bar2.style.marginLeft = "0"
         leftSide = !leftSide
     }
 })
@@ -49,10 +49,10 @@ menu.addEventListener('click', () => {
     if (!isHidden) {
         if (leftSide) {
             // fix this
-            menu.style.marginLeft = "30px"
+            menu.style.marginLeft = "23px"
         } else {
             // fix this
-            menu.style.marginRight = "30px"
+            menu.style.marginLeft = "23px"
         }
         bar1.style.width = "35px"
         bar2.style.width = "35px"

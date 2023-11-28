@@ -9,6 +9,9 @@ const { elementIsDisabled } = require('selenium-webdriver/lib/until')
 require('dotenv').config()
 const sound = require('sound-play')
 const gTTS = require('gtts')
+const path = require('path')
+const {keyboard, Key} = require("@nut-tree/nut-js")
+const Keyboard = require('input-event/lib/keyboard')
 
 
 const client = redis.createClient()
@@ -19,6 +22,11 @@ let isCollapsed = true
 let paused = false
 let done = false
 let speech = false
+
+async function helpme() {
+  console.log('test')
+  return "hello"
+}
 
 function createWindow () {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -33,22 +41,25 @@ function createWindow () {
     autoHideMenuBar: true,
     transparent: true,
     alwaysOnTop: true,
-    titleBarStyle: 'hidden',
+    minimizable: false,
+    maximizable: false,
+    closable: false,
+    // titleBarStyle: 'hidden',
     x: parseInt(0.05*windowWidth),
-    y: parseInt((height-windowHeight)-(windowHeight*0.2)),
+    y: parseInt((height-windowHeight)-(windowHeight*0.1)),
     webPreferences: {
       nodeIntegration: true,
-      preload: __dirname + "\\preload.js"
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
   ipcMain.on('set-side', () => {
     if (leftSide) {
-      win.setPosition((width - parseInt(0.05*windowWidth) - windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+      win.setPosition(parseInt(0.05*windowWidth), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
       leftSide = !leftSide
     }
     else {
-      win.setPosition(parseInt(0.05*windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+      win.setPosition(parseInt(0.05*windowWidth), parseInt((height-windowHeight)-(windowHeight*0.1)), true)
       leftSide = !leftSide
     }
   })
@@ -59,7 +70,7 @@ function createWindow () {
       win.setMaximumSize(windowHeight,windowHeight,true)
       win.setSize(windowHeight,windowHeight,true)
       if (!leftSide) {
-        win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+        // win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
       }
       isCollapsed = !isCollapsed
     }
@@ -68,7 +79,7 @@ function createWindow () {
       win.setMaximumSize(windowWidth,windowHeight,true)
       win.setSize(windowWidth,windowHeight,true)
       if (!leftSide) {
-        win.setPosition((width - parseInt(0.05*windowWidth) - windowWidth), parseInt((height-windowHeight)-(windowHeight*0.2)), true)
+        // win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
       }
       isCollapsed = !isCollapsed
     }
@@ -77,14 +88,11 @@ function createWindow () {
   ipcMain.on('back-space', () => {
     if (speech) {
       setTimeout(function() {
-        ks.sendCombination(['control','back_space'])
+        deleteWord()
       }, 100)
     } else {
       setTimeout(function() {
-        ks.sendCombination(["alt","tab"])
-        setTimeout(function() {
-          ks.sendCombination(['control','back_space'])
-        }, 100)
+        tabDelete()
       }, 10)
     }
   })
@@ -113,8 +121,10 @@ function createWindow () {
   ipcMain.on('play-button', () => {
     win.show()
     done = false
-    ks.sendCombination(["alt","tab"])
+    tabOut()
   })
+
+  win.webContents.send('senddata', "help me pls")
 
   win.loadURL('http://localhost:3000');
 
@@ -134,12 +144,12 @@ function createNewWindow() {
     autoHideMenuBar: true,
     transparent: true,
     alwaysOnTop: true,
-    titleBarStyle: 'hidden',
+    // titleBarStyle: 'hidden',
     x: parseInt((0.5*width)-(0.5*windowWidth)),
     y: parseInt((height-windowHeight)-(windowHeight*1.2)),
     webPreferences: {
       nodeIntegration: true,
-      preload: __dirname + "\\preload.js",
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: false
     }
   })
@@ -155,7 +165,7 @@ function createNewWindow() {
 
   win2.on('blur', () => {
     if (!done) {
-      ks.sendCombination(["alt","tab"])
+      tabOut()
     }
   })
 
@@ -180,12 +190,15 @@ function playWindow() {
     autoHideMenuBar: true,
     transparent: true,
     alwaysOnTop: true,
-    titleBarStyle: 'hidden',
+    minimizable: false,
+    maximizable: false,
+    closable: false,
+    // titleBarStyle: 'hidden',
     x: parseInt((0.5*width)-(0.5*windowWidth)),
     y: parseInt((height-windowHeight)-(windowHeight*0.2)),
     webPreferences: {
       nodeIntegration: true,
-      preload: __dirname + "\\preload.js"
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -232,7 +245,7 @@ app.on('activate', () => {
 
 async function readSerial() {
 
-  const port = new SerialPort({ path: 'COM5', baudRate: 115200 })
+  const port = new SerialPort({ path: '/dev/tty.usbserial-2120', baudRate: 115200 })
 
   const parser = new ReadlineParser({delimiter: '\n'})
   port.pipe(parser)
@@ -247,11 +260,12 @@ async function readSerial() {
       let data = dat
       data = data.split(',')
       console.log(data)
-      let word = data[0].split('')
-      word.push("space")
+      let word = data[0] + " "
+      // let word = data[0].split('')
+      // word.push("space")
       let sentence = data[1]
       if (!paused && !speech) {
-        ks.sendKeys(word)
+        typeWord(word)
       }
       else if (!paused && speech && !done) {
         // ipcMain.handle('speech-text', pleaseHelp)
@@ -260,6 +274,27 @@ async function readSerial() {
     }
   })
 
+}
+
+async function tabDelete() {
+  await keyboard.pressKey(Key.LeftSuper, Key.Tab)
+  await keyboard.releaseKey(Key.LeftSuper, Key.Tab)
+  await keyboard.pressKey(Key.LeftAlt, Key.Backspace)
+  await keyboard.releaseKey(Key.LeftAlt, Key.Backspace)
+}
+
+async function deleteWord() {
+  await keyboard.pressKey(Key.LeftControl, Key.Backspace)
+  await keyboard.releaseKey(Key.LeftControl, Key.Backspace)
+}
+
+async function tabOut() {
+  await keyboard.pressKey(Key.LeftSuper, Key.Tab)
+  await keyboard.releaseKey(Key.LeftSuper, Key.Tab)
+}
+
+async function typeWord(w) {
+  await keyboard.type(String(w))
 }
 
 // async function startRedisClient() {
