@@ -133,6 +133,12 @@ function createWindow () {
     tabOut()
   })
 
+  ipcMain.on('redo-button', () => {
+    win.show()
+    done = false
+    tabOut()
+  })
+
   win.loadURL('http://localhost:3000');
 
   // win.webContents.openDevTools()
@@ -229,6 +235,11 @@ function playWindow() {
 
   ipcMain.on('play-button', () => {
     playSound(sentence)
+    win3.hide()
+    done = false
+  })
+
+  ipcMain.on('redo-button', () => {
     win3.hide()
     done = false
   })
