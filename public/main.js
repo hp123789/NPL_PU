@@ -336,7 +336,8 @@ async function playSound(input) {
 async function sendMessage(message) {
     if (s != sentence) {
       console.log('sending')
-      BrowserWindow.getFocusedWindow().webContents.send("message", message)
+      const activeWindow = BrowserWindow.getFocusedWindow()
+      activeWindow.webContents.send("message", message)
       s = sentence
   }
 }
