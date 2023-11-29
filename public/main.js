@@ -24,6 +24,8 @@ let done = false
 let speech = false
 let sentence = ""
 let s = ""
+let devicePort = ""
+let foundPort = false
 
 async function helpme() {
   console.log('test')
@@ -250,7 +252,9 @@ function playWindow() {
 app.whenReady().then(() => {
   // startRedisClient()
   // redisXrevrange()
-  readSerial()
+  // readSerial()
+  findDevicePort()
+  checkFlag()
   createWindow()
 })
 
@@ -269,7 +273,21 @@ app.on('activate', () => {
 
 async function readSerial() {
 
-  const port = new SerialPort({ path: '/dev/tty.usbserial-2120', baudRate: 115200 })
+  // let devicePort = "/dev/tty.usbserial-120"
+
+  // SerialPort.list().then(function(ports){
+  //   ports.forEach(function(port){
+  //     if (port['vendorId']) {
+  //       if (port['vendorId'] == "1a86") {
+  //         let devicePort = port['path']
+  //         console.log(devicePort)
+  //         return devicePort
+  //       }
+  //     }
+  //   })
+  // });
+  
+  const port = new SerialPort({ path: devicePort, baudRate: 115200 })
 
   const parser = new ReadlineParser({delimiter: '\n'})
   port.pipe(parser)
@@ -339,6 +357,30 @@ async function sendMessage(message) {
       const activeWindow = BrowserWindow.getFocusedWindow()
       activeWindow.webContents.send("message", message)
       s = sentence
+  }
+}
+
+async function findDevicePort() {
+  SerialPort.list().then(function(ports){
+    ports.forEach(function(port){
+      if (port['vendorId']) {
+        if (port['vendorId'] == "1a86") {
+          devicePort = port['path']
+          console.log(devicePort)
+          foundPort = true
+          // return devicePort
+        }
+      }
+    })
+  });
+}
+
+function checkFlag() {
+  if(foundPort === false) {
+     setTimeout(checkFlag, 100); /* this checks the flag every 100 milliseconds*/
+  } else {
+    /* do something*/
+    readSerial()
   }
 }
 
