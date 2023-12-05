@@ -132,13 +132,13 @@ function createWindow () {
   ipcMain.on('play-button', () => {
     win.show()
     done = false
-    tabOut()
+    // tabOut()
   })
 
   ipcMain.on('redo-button', () => {
     win.show()
     done = false
-    tabOut()
+    // tabOut()
   })
 
   win.loadURL('http://localhost:3000');
@@ -180,7 +180,7 @@ function createNewWindow() {
 
   win2.on('blur', () => {
     if (!done) {
-      tabOut()
+      // tabOut()
     }
   })
 
@@ -305,6 +305,7 @@ async function readSerial() {
       let word = data[0] + " "
       // let word = data[0].split('')
       // word.push("space")
+      // do not update sentence after done button is pressed
       sentence = data[1]
       if (!paused && !speech) {
         typeWord(word)
@@ -354,7 +355,9 @@ async function playSound(input) {
 async function sendMessage(message) {
     if (s != sentence) {
       console.log('sending')
-      const activeWindow = BrowserWindow.getFocusedWindow()
+      // const activeWindow = BrowserWindow.getFocusedWindow()
+      const activeWindow = BrowserWindow.getAllWindows()[0]
+      // console.log(BrowserWindow.getAllWindows()[0]["_events"]["close"])
       activeWindow.webContents.send("message", message)
       s = sentence
   }

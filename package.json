@@ -2,7 +2,10 @@
   "name": "personal_use",
   "version": "0.1.0",
   "private": true,
-  "main": "public/main.js",
+  "homepage": "./",
+  "author": "UCD NPL",
+  "description": "Personal Use",
+  "main": "public/electron.js",
   "dependencies": {
     "@fontsource/inter": "^5.0.15",
     "@nut-tree/nut-js": "^3.1.2",
@@ -11,7 +14,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "dotenv": "^16.3.1",
-    "electron": "^27.0.4",
+    "node-key-sender": "^1.0.11",
     "gtts": "^0.2.1",
     "input-event": "^1.2.6",
     "react": "^18.2.0",
@@ -50,6 +53,23 @@
     ]
   },
   "devDependencies": {
-    "node-key-sender": "^1.0.11"
+    "electron": "^27.0.4"
+  },
+  "build": {
+    "appId": "com.electron.app",
+    "productName": "UCD NPL Personal Use",
+    "files": ["build/**/*", "node_modules/**/*"],
+    "directories": {
+      "buildResources": "public"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "deb"
+    }
   }
 }
