@@ -80,7 +80,9 @@
     scale: 1.5;
 }
 
-.bar1, .bar2, .bar3 {
+.bar1,
+.bar2,
+.bar3 {
     position: relative;
     width: 35px;
     height: 5px;

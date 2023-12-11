@@ -1,17 +1,15 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const remote = require('electron')
-const {screen} = remote
+const { screen } = remote
 const redis = require('redis')
 var ks = require('node-key-sender')
 const { SerialPort } = require('serialport')
 const { ReadlineParser } = require('@serialport/parser-readline')
-const { elementIsDisabled } = require('selenium-webdriver/lib/until')
 require('dotenv').config()
 const sound = require('sound-play')
 const gTTS = require('gtts')
 const path = require('path')
-const {keyboard, Key, getActiveWindow} = require("@nut-tree/nut-js")
-const Keyboard = require('input-event/lib/keyboard')
+const { keyboard, Key, getActiveWindow } = require("@nut-tree/nut-js")
 
 
 const client = redis.createClient()
@@ -32,17 +30,17 @@ async function helpme() {
   return "hello"
 }
 
-async function handleFileOpen () {
+async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog()
   if (!canceled) {
     return filePaths[0]
   }
 }
 
-function createWindow () {
+function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const windowHeight = parseInt(0.1*height)
-  const windowWidth = parseInt(0.5*width)
+  const windowHeight = parseInt(0.1 * height)
+  const windowWidth = parseInt(0.3 * width)
   const win = new BrowserWindow({
     width: windowWidth,
     height: windowHeight,
@@ -55,9 +53,8 @@ function createWindow () {
     minimizable: false,
     maximizable: false,
     closable: false,
-    // titleBarStyle: 'hidden',
-    x: parseInt(0.05*windowWidth),
-    y: parseInt((height-windowHeight)-(windowHeight*0.1)),
+    x: parseInt(0.05 * windowWidth),
+    y: parseInt((height - windowHeight) - (windowHeight * 0.1)),
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
@@ -66,56 +63,41 @@ function createWindow () {
 
   ipcMain.on('set-side', () => {
     if (leftSide) {
-      win.setPosition(parseInt(0.05*windowWidth), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
+      win.setPosition(parseInt(0.05 * windowWidth), parseInt((windowHeight - height) + (windowHeight * 0.1)), true)
       leftSide = !leftSide
     }
     else {
-      win.setPosition(parseInt(0.05*windowWidth), parseInt((height-windowHeight)-(windowHeight*0.1)), true)
+      win.setPosition(parseInt(0.05 * windowWidth), parseInt((height - windowHeight) - (windowHeight * 0.1)), true)
       leftSide = !leftSide
     }
   })
 
   ipcMain.on('collapse-menu', () => {
     if (isCollapsed) {
-      win.setMinimumSize(windowHeight,windowHeight,true)
-      win.setMaximumSize(windowHeight,windowHeight,true)
-      win.setSize(windowHeight,windowHeight,true)
-      if (!leftSide) {
-        // win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
-      }
+      win.setMinimumSize(windowHeight, windowHeight, true)
+      win.setMaximumSize(windowHeight, windowHeight, true)
+      win.setSize(windowHeight, windowHeight, true)
       isCollapsed = !isCollapsed
     }
     else {
-      win.setMinimumSize(windowWidth,windowHeight,true)
-      win.setMaximumSize(windowWidth,windowHeight,true)
-      win.setSize(windowWidth,windowHeight,true)
-      if (!leftSide) {
-        // win.setPosition((parseInt(width-(0.05*windowWidth)-windowHeight)), parseInt((windowHeight-height)+(windowHeight*0.1)), true)
-      }
+      win.setMinimumSize(windowWidth, windowHeight, true)
+      win.setMaximumSize(windowWidth, windowHeight, true)
+      win.setSize(windowWidth, windowHeight, true)
       isCollapsed = !isCollapsed
     }
   })
 
   ipcMain.on('back-space', () => {
-    if (speech) {
-      setTimeout(function() {
-        deleteWord()
-      }, 100)
-    } else {
-      setTimeout(function() {
-        tabDelete()
-      }, 10)
-    }
+    setTimeout(function () {
+      deleteWord()
+    }, 100)
+    setTimeout(function () {
+      tabDelete()
+    }, 10)
   })
 
   ipcMain.on('pause-button', () => {
     paused = !paused
-    // if (paused) {
-    //   win.setMaximumSize(width, height)
-    // } else {
-    //   win.setMaximumSize(windowWidth, windowHeight)
-    // }
-    // win.setFullScreen(paused)
   })
 
   ipcMain.on('speech-mode', () => {
@@ -129,6 +111,12 @@ function createWindow () {
     playWindow()
   })
 
+  ipcMain.on('type-sentence', () => {
+    win.show()
+    done = false
+    // tabOut()
+  })
+
   ipcMain.on('play-button', () => {
     win.show()
     done = false
@@ -138,7 +126,6 @@ function createWindow () {
   ipcMain.on('redo-button', () => {
     win.show()
     done = false
-    // tabOut()
   })
 
   win.loadURL('http://localhost:3000');
@@ -148,8 +135,8 @@ function createWindow () {
 
 function createNewWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const windowHeight = parseInt(0.1*height)
-  const windowWidth = parseInt(0.5*width)
+  const windowHeight = parseInt(0.1 * height)
+  const windowWidth = parseInt(width)
   let win2 = new BrowserWindow({
     width: windowWidth,
     height: windowHeight,
@@ -159,9 +146,8 @@ function createNewWindow() {
     autoHideMenuBar: true,
     transparent: true,
     alwaysOnTop: true,
-    // titleBarStyle: 'hidden',
-    x: parseInt((0.5*width)-(0.5*windowWidth)),
-    y: parseInt((height-windowHeight)-(windowHeight*1.2)),
+    x: parseInt((0.5 * width) - (0.5 * windowWidth)),
+    y: parseInt((height - windowHeight) - (windowHeight * 1.2)),
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
@@ -173,16 +159,10 @@ function createNewWindow() {
     win2 = null;
   });
 
-    // set to null
+  // set to null
   win2.on('closed', () => {
     win2 = null;
   });
-
-  win2.on('blur', () => {
-    if (!done) {
-      // tabOut()
-    }
-  })
 
   ipcMain.on('text-mode', () => {
     win2.hide()
@@ -192,15 +172,30 @@ function createNewWindow() {
   ipcMain.on('help', () => {
     console.log('help')
   })
-  
+
+  ipcMain.on('type-sentence', () => {
+    win2.focus()
+  })
+
+  ipcMain.on('play-button', () => {
+    win2.focus()
+  })
+
+  ipcMain.on('redo-button', () => {
+    win2.focus()
+  })
+
+  win2.setIgnoreMouseEvents(true)
+  // win2.setFocusable(false)
+
 
   win2.loadFile(__dirname + "\\caption.html");
 }
 
 function playWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const windowHeight = parseInt(0.1*height)
-  const windowWidth = parseInt(0.3*width)
+  const windowHeight = parseInt(0.1 * height)
+  const windowWidth = parseInt(0.4 * width)
   let win3 = new BrowserWindow({
     width: windowWidth,
     height: windowHeight,
@@ -213,9 +208,8 @@ function playWindow() {
     minimizable: false,
     maximizable: false,
     closable: false,
-    // titleBarStyle: 'hidden',
-    x: parseInt((0.5*width)-(0.5*windowWidth)),
-    y: parseInt((height-windowHeight)-(windowHeight*0.2)),
+    x: parseInt((0.5 * width) - (0.5 * windowWidth)),
+    y: parseInt((height - windowHeight) - (windowHeight * 0.2)),
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
@@ -226,16 +220,20 @@ function playWindow() {
     win3 = null;
   });
 
-    // set to null
+  // set to null
   win3.on('closed', () => {
     win3 = null;
   });
 
-  ipcMain.on('text-mode', () => {
+  ipcMain.on('type-sentence', () => {
+    tabOut()
+    typeWord(sentence)
     win3.hide()
+    done = false
   })
 
   ipcMain.on('play-button', () => {
+    console.log("Playing this sentence: " + sentence)
     playSound(sentence)
     win3.hide()
     done = false
@@ -256,6 +254,7 @@ app.whenReady().then(() => {
   findDevicePort()
   checkFlag()
   createWindow()
+  createNewWindow()
 })
 
 app.on('window-all-closed', () => {
@@ -265,7 +264,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  
+
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
@@ -273,46 +272,22 @@ app.on('activate', () => {
 
 async function readSerial() {
 
-  // let devicePort = "/dev/tty.usbserial-120"
-
-  // SerialPort.list().then(function(ports){
-  //   ports.forEach(function(port){
-  //     if (port['vendorId']) {
-  //       if (port['vendorId'] == "1a86") {
-  //         let devicePort = port['path']
-  //         console.log(devicePort)
-  //         return devicePort
-  //       }
-  //     }
-  //   })
-  // });
-  
   const port = new SerialPort({ path: devicePort, baudRate: 115200 })
 
-  const parser = new ReadlineParser({delimiter: '\n'})
+  const parser = new ReadlineParser({ delimiter: '\n' })
   port.pipe(parser)
 
   let p_dat = ""
   parser.on("data", (line) => {
     let dat = line
     if (dat != p_dat) {
-      console.log(dat)
       p_dat = dat
-      // let data = String(dat.slice(0, -1))
       let data = dat
       data = data.split(',')
-      console.log(data)
       let word = data[0] + " "
-      // let word = data[0].split('')
-      // word.push("space")
-      // do not update sentence after done button is pressed
-      sentence = data[1]
-      if (!paused && !speech) {
-        typeWord(word)
-      }
-      else if (!paused && speech && !done) {
-        // ipcMain.handle('speech-text', pleaseHelp)
-        // remote.webContents.send('async-message', 'help')
+      if (!done && !paused) {
+        sentence = data[1]
+        console.log(sentence)
         sendMessage(sentence)
       }
     }
@@ -338,40 +313,41 @@ async function tabOut() {
 }
 
 async function typeWord(w) {
-  await keyboard.type(String(w))
+  setTimeout(function () {
+    keyboard.type(String(w))
+  }, 500)
+
 }
 
 async function playSound(input) {
   var gtts = new gTTS(input, 'en');
-  setTimeout(function() {
+  setTimeout(function () {
     gtts.save('/tmp/hello.mp3', function (err, result) {
-      if(err) { throw new Error(err) }
-      console.log('Success! Open file /tmp/hello.mp3 to hear result.');
+      if (err) { throw new Error(err) }
     });
-  },500)
+  }, 1000)
   sound.play('/tmp/hello.mp3')
 }
 
 async function sendMessage(message) {
-    if (s != sentence) {
-      console.log('sending')
-      // const activeWindow = BrowserWindow.getFocusedWindow()
-      const activeWindow = BrowserWindow.getAllWindows()[0]
-      // console.log(BrowserWindow.getAllWindows()[0]["_events"]["close"])
-      activeWindow.webContents.send("message", message)
-      s = sentence
+  if (s != sentence) {
+    // const activeWindow = BrowserWindow.getFocusedWindow()
+    const activeWindow = BrowserWindow.getAllWindows()[0]
+    // console.log(BrowserWindow.getAllWindows())
+    // console.log(BrowserWindow.getAllWindows()[0]["_events"]["close"])
+    activeWindow.webContents.send("message", message)
+    s = sentence
   }
 }
 
 async function findDevicePort() {
-  SerialPort.list().then(function(ports){
-    ports.forEach(function(port){
+  SerialPort.list().then(function (ports) {
+    ports.forEach(function (port) {
       if (port['vendorId']) {
         if (port['vendorId'] == "1a86") {
           devicePort = port['path']
           console.log(devicePort)
           foundPort = true
-          // return devicePort
         }
       }
     })
@@ -379,10 +355,9 @@ async function findDevicePort() {
 }
 
 function checkFlag() {
-  if(foundPort === false) {
-     setTimeout(checkFlag, 100); /* this checks the flag every 100 milliseconds*/
+  if (foundPort === false) {
+    setTimeout(checkFlag, 100);
   } else {
-    /* do something*/
     readSerial()
   }
 }
@@ -397,7 +372,7 @@ function checkFlag() {
 //   console.log(value)
 //   return value
 // }
-// 
+//
 // async function redisXread() {
 //   while (true) {
 //     let response = await client.xRead(
