@@ -28,7 +28,26 @@ body {
     font-family: "Inter";
     font-size: 150px;
     /* text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black; */
-    -webkit-text-stroke: 3px black;
+    /* -webkit-text-stroke: 3px black; */
+    text-shadow:
+    -3px -3px 0 #000,
+     0   -3px 0 #000,
+     3px -3px 0 #000,
+     3px  0   0 #000,
+     3px  3px 0 #000,
+     0    3px 0 #000,
+    -3px  3px 0 #000,
+    -3px  0   0 #000;
     text-wrap: wrap;
     word-wrap: break-word;
+    /* text-transform: lowercase; */
+}
+
+.text-input span:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.text-input span:active {
+    text-transform: uppercase;
 }

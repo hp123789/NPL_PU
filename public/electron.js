@@ -12,8 +12,8 @@ const path = require('path')
 const { keyboard, Key, getActiveWindow } = require("@nut-tree/nut-js")
 
 
-const client = redis.createClient()
-const stream_name = "stream2"
+const client = redis.createClient({ socket: { port: "6379", host: "192.168.50.58" } })
+const stream_name = "tts_partial_decoded_sentence"
 
 let leftSide = true
 let isCollapsed = true
@@ -24,18 +24,6 @@ let sentence = ""
 let s = ""
 let devicePort = ""
 let foundPort = false
-
-async function helpme() {
-  console.log('test')
-  return "hello"
-}
-
-async function handleFileOpen() {
-  const { canceled, filePaths } = await dialog.showOpenDialog()
-  if (!canceled) {
-    return filePaths[0]
-  }
-}
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -107,6 +95,7 @@ function createWindow() {
 
   ipcMain.on('done-button', () => {
     done = true
+    BrowserWindow.fromId(2).setIgnoreMouseEvents(false)
     win.hide()
     playWindow()
   })
@@ -114,18 +103,21 @@ function createWindow() {
   ipcMain.on('type-sentence', () => {
     win.show()
     done = false
+    BrowserWindow.fromId(2).setIgnoreMouseEvents(true)
     // tabOut()
   })
 
   ipcMain.on('play-button', () => {
     win.show()
     done = false
+    BrowserWindow.fromId(2).setIgnoreMouseEvents(true)
     // tabOut()
   })
 
   ipcMain.on('redo-button', () => {
     win.show()
     done = false
+    BrowserWindow.fromId(2).setIgnoreMouseEvents(true)
   })
 
   win.loadURL('http://localhost:3000');
@@ -175,14 +167,21 @@ function createNewWindow() {
 
   ipcMain.on('type-sentence', () => {
     win2.focus()
+    redisXadd()
   })
 
   ipcMain.on('play-button', () => {
     win2.focus()
+    redisXadd()
   })
 
   ipcMain.on('redo-button', () => {
     win2.focus()
+    redisXadd()
+  })
+
+  ipcMain.on("error-word", (event, arg) => {
+    console.log(arg)
   })
 
   win2.setIgnoreMouseEvents(true)
@@ -248,11 +247,12 @@ function playWindow() {
 }
 
 app.whenReady().then(() => {
-  // startRedisClient()
-  // redisXrevrange()
+  startRedisClient()
+  // redisGet()
+  redisXrevrange()
   // readSerial()
-  findDevicePort()
-  checkFlag()
+  // findDevicePort()
+  // checkFlag()
   createWindow()
   createNewWindow()
 })
@@ -314,6 +314,7 @@ async function tabOut() {
 
 async function typeWord(w) {
   setTimeout(function () {
+    console.log("Typing this sentence: ", w)
     keyboard.type(String(w))
   }, 500)
 
@@ -331,10 +332,8 @@ async function playSound(input) {
 
 async function sendMessage(message) {
   if (s != sentence) {
-    // const activeWindow = BrowserWindow.getFocusedWindow()
-    const activeWindow = BrowserWindow.getAllWindows()[0]
-    // console.log(BrowserWindow.getAllWindows())
-    // console.log(BrowserWindow.getAllWindows()[0]["_events"]["close"])
+    console.log(sentence)
+    const activeWindow = BrowserWindow.fromId(2)
     activeWindow.webContents.send("message", message)
     s = sentence
   }
@@ -362,16 +361,16 @@ function checkFlag() {
   }
 }
 
-// async function startRedisClient() {
-//   client.on('error', err => console.log('Redis Client Error', err))
-//   await client.connect()
-// }
+async function startRedisClient() {
+  client.on('error', err => console.log('Redis Client Error', err))
+  await client.connect()
+}
 
-// async function redisGet() {
-//   const value = await client.get('output_stream');
-//   console.log(value)
-//   return value
-// }
+async function redisGet() {
+  const value = await client.get('hello');
+  console.log(value)
+  return value
+}
 //
 // async function redisXread() {
 //   while (true) {
@@ -393,13 +392,27 @@ function checkFlag() {
 //   }
 // }
 
-// async function redisXrevrange() {
-//     let response = await client.xRevRange(stream_name, '+', '-', 'COUNT', '1', function(err, Data) {})
-//     response = response[0].message['word']
-//     response = JSON.stringify(response).replace(/^"(.*)"$/, '$1')
-//     return response
-//   }
+async function redisXrevrange() {
+  let c = ""
+  while (true) {
+    try {
+      let response = await client.xRevRange(stream_name, '+', '-', 'COUNT', '1', function (err, Data) { })
+      response = response[0].message['word']
+      response = JSON.stringify(response).replace(/^"(.*)"$/, '$1')
+      // return response
+      if (response != c) {
+        // console.log(response)
+        if (!paused && !done) {
+          sentence = response
+          sendMessage(sentence)
+        }
+        c = response
+      }
+    }
+    catch {}
+  }
+}
 
-// async function redisXadd() {
-//   client.xAdd(stream_name, "*", "state", "speech", "word", "word1")
-// }
+async function redisXadd() {
+  client.xAdd(stream_name, "*", {word: ""})
+}

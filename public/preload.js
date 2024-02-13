@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   play: () => ipcRenderer.send('play-button'),
   help: () => ipcRenderer.send('help'),
   redo: () => ipcRenderer.send('redo-button'),
-  type: () => ipcRenderer.send('type-sentence')
+  type: () => ipcRenderer.send('type-sentence'),
+  // errorWord: (word) => ipcRenderer.send('error-word', word)
 })
